@@ -19,20 +19,32 @@ export default async function handler(req, res) {
 
   try {
     const { prompt } = req.body;
+    const enhancedPrompt = `
+${prompt},
+authentic influencer lifestyle photography,
+instagram story style,
+smartphone camera photo,
+natural daylight,
+real skin texture,
+casual candid moment,
+social media content,
+natural pose,
+real life environment,
+slightly imperfect framing,
+unedited photo,
+high quality smartphone photography,
+authentic UGC content,
+natural color grading,
+shallow depth of field
+`;
 
     const image = await client.textToImage({
-    provider: "nscale",
-    model: "black-forest-labs/FLUX.1-dev",
-    inputs: `${prompt},
-authentic photography,
-realistic lighting,
-natural composition,
-professional camera,
-high detail,
-real world environment`,
-    parameters: {
-        num_inference_steps: 10
-    }
+  provider: "fal-ai",
+  model: "black-forest-labs/FLUX.1-dev",
+  inputs: enhancedPrompt,
+  parameters: {
+    num_inference_steps: 20
+  }
 });
 
     const arrayBuffer = await image.arrayBuffer();
