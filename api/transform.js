@@ -23,17 +23,7 @@ export default async function handler(req, res) {
     const image = await client.textToImage({
     provider: "nscale",
     model: "black-forest-labs/FLUX.1-schnell",
-    inputs: `${prompt},
-    smartphone photo,
-    authentic UGC photography,
-    natural lighting,
-    candid moment,
-    real life photography,
-    realistic skin texture,
-    unedited photo,
-    social media photo,
-    shot on iPhone,
-    slightly imperfect framing`,
+    inputs: prompt,
     parameters: {
         num_inference_steps: 10
     }
