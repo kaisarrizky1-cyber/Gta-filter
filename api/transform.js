@@ -23,7 +23,7 @@ export default async function handler(req, res) {
     const image = await client.textToImage({
       provider: "nscale",
       model: "stabilityai/stable-diffusion-xl-base-1.0",
-      inputs: `GTA V game style, rockstar games, ${prompt}`,
+      inputs: prompt ,
       parameters: {
         num_inference_steps: 5
       }
