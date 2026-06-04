@@ -30,7 +30,7 @@ export default async function handler(req, res) {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          version: 'pwntus/sdxl-gta-v:c6b5d2b7459910fec94de966af579571dbaf4889b8c6cd6f670afbe00ca4652d',
+          version: 'pwntus/sdxl-gta-:326cf15ffffc4e2b157d0a1974891cd7893f4542b508be349f3c115412506c5e',
           input: {
             prompt: 'GTA V style, rockstar games character, photorealistic, cinematic lighting, los santos, detailed',
             image: `data:${mimeType};base64,${imageData}`,
