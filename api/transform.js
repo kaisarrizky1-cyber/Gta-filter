@@ -6,7 +6,7 @@ export default async function handler(req, res) {
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
-  const REPLICATE_TOKEN = 'r8_9R6vapaeCv7UR9HinDW88NBLGuL6HfE4Ht03g';
+  const REPLICATE_TOKEN = process.env.REPLICATE_TOKEN;
   const MODEL_VERSION = 'tencentarc/photomaker-style:467d062309da518648ba89d226490e02b8ed09b5abf28aef0a536c851851943';
 
   try {
@@ -50,4 +50,4 @@ export default async function handler(req, res) {
   } catch (err) {
     return res.status(500).json({ error: err.message });
   }
-    }
+}
