@@ -7,7 +7,11 @@ export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
   const HF_TOKEN = process.env.HF_TOKEN;
-
+  if (!HF_TOKEN) {
+  return res.status(500).json({
+    error: 'HF_TOKEN tidak ditemukan'
+  });
+}
   let body;
   try {
     body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
