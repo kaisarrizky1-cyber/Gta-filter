@@ -21,13 +21,13 @@ export default async function handler(req, res) {
     const { prompt } = req.body;
 
     const image = await client.textToImage({
-      provider: "nscale",
-      model: "stabilityai/stable-diffusion-xl-base-1.0",
-      inputs: prompt ,
-      parameters: {
-        num_inference_steps: 5
-      }
-    });
+    provider: "nscale",
+    model: "black-forest-labs/FLUX.1-schnell",
+    inputs: `${prompt}, highly detailed, realistic lighting, professional photography`,
+    parameters: {
+        num_inference_steps: 10
+    }
+});
 
     const arrayBuffer = await image.arrayBuffer();
     const base64 = Buffer.from(arrayBuffer).toString("base64");
