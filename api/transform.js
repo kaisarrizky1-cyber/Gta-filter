@@ -22,7 +22,7 @@ export default async function handler(req, res) {
 
     const image = await client.textToImage({
     provider: "nscale",
-    model: "black-forest-labs/FLUX.1-schnell",
+    model: "black-forest-labs/FLUX.1-dev",
     inputs: `${prompt},
 authentic photography,
 realistic lighting,
