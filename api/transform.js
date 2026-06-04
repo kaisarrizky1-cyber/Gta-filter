@@ -48,6 +48,7 @@ export default async function handler(req, res) {
     return res.status(200).json({ image: `data:image/jpeg;base64,${base64}` });
 
   } catch (err) {
+    console.error("FULL ERROR:", err);
     return res.status(500).json({ error: err.message });
   }
 }
