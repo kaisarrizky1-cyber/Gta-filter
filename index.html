@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GTA V Style Filter</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Syne:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg: #080808; --surface: #101010; --border: #1c1c1c;
+  --gold: #f0c040; --red: #d63b1f; --text: #e8e8e8; --muted: #444;
+}
+html, body { min-height: 100vh; background: var(--bg); color: var(--text); font-family: 'Syne', sans-serif; font-weight: 300; }
+
+.page { min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding: 52px 20px 80px; }
+
+header { text-align: center; margin-bottom: 48px; }
+.eyebrow { font-size: 10px; letter-spacing: 0.3em; color: var(--muted); margin-bottom: 10px; text-transform: uppercase; }
+.logo { font-family: 'Bebas Neue', sans-serif; font-size: clamp(64px, 13vw, 110px); color: var(--gold); letter-spacing: 0.06em; line-height: 0.85; text-shadow: 0 0 60px rgba(240,192,64,0.2); }
+.logo span { display: block; font-size: 0.4em; color: #555; letter-spacing: 0.25em; }
+.tagline { margin-top: 14px; font-size: 12px; color: #333; letter-spacing: 0.08em; }
+
+/* Upload */
+.upload-zone {
+  width: 100%; max-width: 480px;
+  border: 1px dashed #1e1e1e; border-radius: 2px;
+  padding: 52px 32px; text-align: center;
+  cursor: pointer; background: var(--surface);
+  transition: border-color 0.2s, background 0.2s;
+  position: relative;
+}
+.upload-zone:hover { border-color: var(--gold); background: #111; }
+.upload-zone input { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
+.upload-icon { width: 52px; height: 52px; border: 1px solid #1e1e1e; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; }
+.upload-label { font-size: 14px; color: #555; line-height: 1.8; }
+.upload-label strong { color: var(--gold); font-weight: 500; }
+.upload-sub { font-size: 11px; color: #2a2a2a; margin-top: 6px; }
+
+/* Workspace */
+.workspace { display: none; width: 100%; max-width: 860px; flex-direction: column; gap: 16px; }
+.workspace.on { display: flex; }
+
+.pair { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+@media(max-width:560px) { .pair { grid-template-columns: 1fr; } }
+
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: 2px; overflow: hidden; position: relative; }
+.card-label { position: absolute; top: 10px; left: 10px; font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase; color: #333; background: rgba(8,8,8,0.85); padding: 4px 8px; border-radius: 2px; z-index: 2; }
+.card img { display: block; width: 100%; aspect-ratio: 3/4; object-fit: cover; background: #0d0d0d; }
+
+.placeholder { width: 100%; aspect-ratio: 3/4; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; background: #0a0a0a; color: #2a2a2a; }
+.placeholder p { font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase; }
+
+.loading-box { position: absolute; inset: 0; background: rgba(8,8,8,0.92); display: none; flex-direction: column; align-items: center; justify-content: center; gap: 14px; backdrop-filter: blur(6px); z-index: 5; }
+.loading-box.on { display: flex; }
+.ring { width: 40px; height: 40px; border: 1.5px solid #1c1c1c; border-top-color: var(--gold); border-radius: 50%; animation: spin 0.9s linear infinite; }
+.loading-msg { font-size: 11px; color: #555; letter-spacing: 0.1em; text-transform: uppercase; }
+.prog-wrap { width: 120px; height: 1px; background: #1c1c1c; }
+.prog-bar { height: 100%; background: var(--gold); transition: width 0.5s ease; width: 0%; }
+.loading-sub { font-size: 10px; color: #2a2a2a; letter-spacing: 0.06em; }
+
+/* Bottom */
+.bottom { background: var(--surface); border: 1px solid var(--border); border-radius: 2px; padding: 16px 20px; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.dot { width: 6px; height: 6px; border-radius: 50%; background: #333; flex-shrink: 0; transition: background 0.3s; }
+.dot.processing { background: var(--gold); animation: pulse 1s infinite; }
+.dot.done { background: #4ade7b; }
+.dot.error { background: var(--red); }
+.status-text { font-size: 11px; color: #444; letter-spacing: 0.05em; flex: 1; min-width: 0; }
+
+.btn { display: inline-flex; align-items: center; gap: 6px; padding: 9px 18px; border-radius: 2px; font-family: 'Syne', sans-serif; font-size: 11px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; cursor: pointer; border: none; transition: all 0.2s; }
+.btn-gold { background: var(--gold); color: #080808; }
+.btn-gold:hover { background: #ffd055; }
+.btn-red { background: var(--red); color: #fff; }
+.btn-red:hover { background: #e8472a; }
+.btn-red:disabled { opacity: 0.3; cursor: not-allowed; }
+.btn-outline { background: transparent; color: #444; border: 1px solid #1e1e1e; font-family: 'Syne', sans-serif; }
+.btn-outline:hover { border-color: #444; color: var(--text); }
+
+.error-box { display: none; background: rgba(214,59,31,0.07); border: 1px solid rgba(214,59,31,0.2); border-radius: 2px; padding: 14px 18px; font-size: 12px; color: #e07060; line-height: 1.6; }
+.error-box.on { display: block; }
+
+footer { margin-top: 60px; font-size: 10px; color: #1a1a1a; letter-spacing: 0.15em; text-transform: uppercase; }
+
+@keyframes spin { to { transform: rotate(360deg); } }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <header>
+    <div class="eyebrow">AI Photo Transform</div>
+    <div class="logo">GTA V<span>Style</span></div>
+    <p class="tagline">Upload foto → Jadi karakter GTA V</p>
+  </header>
+
+  <!-- Upload -->
+  <div class="upload-zone" id="uploadZone">
+    <input type="file" id="fileInput" accept="image/*">
+    <div class="upload-icon">
+      <svg width="22" height="22" fill="none" viewBox="0 0 24 24" stroke="#555" stroke-width="1.5">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5"/>
+      </svg>
+    </div>
+    <p class="upload-label"><strong>Tap atau seret foto</strong> ke sini</p>
+    <p class="upload-sub">Foto langsung diubah jadi karakter GTA V · JPG PNG WEBP</p>
+  </div>
+
+  <!-- Workspace -->
+  <div class="workspace" id="workspace">
+
+    <div class="pair">
+      <div class="card">
+        <div class="card-label">Original</div>
+        <img id="imgOrig" src="" alt="original">
+      </div>
+      <div class="card">
+        <div class="card-label">GTA V Style</div>
+        <div class="placeholder" id="placeholder">
+          <svg width="28" height="28" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z"/>
+          </svg>
+          <p>Menunggu AI</p>
+        </div>
+        <img id="imgResult" src="" alt="result" style="display:none;">
+        <div class="loading-box" id="loadingBox">
+          <div class="ring"></div>
+          <div class="loading-msg" id="loadingMsg">Mengirim ke AI…</div>
+          <div class="prog-wrap"><div class="prog-bar" id="progBar"></div></div>
+          <div class="loading-sub" id="loadingSub">Estimasi 20–50 detik</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="error-box" id="errorBox"></div>
+
+    <div class="bottom">
+      <div class="dot" id="dot"></div>
+      <div class="status-text" id="statusText">Siap</div>
+      <button class="btn btn-red" id="btnDownload" disabled>↓ Download</button>
+      <button class="btn btn-outline" id="btnChange">↺ Ganti Foto
+        <input type="file" accept="image/*" id="fileChange" style="position:absolute;opacity:0;width:100%;height:100%;cursor:pointer;top:0;left:0;">
+      </button>
+    </div>
+
+  </div>
+
+  <footer>Powered by Replicate AI — GTA V Style Transfer</footer>
+</div>
+
+<script>
+let pollTimer = null;
+
+const uploadZone  = document.getElementById('uploadZone');
+const workspace   = document.getElementById('workspace');
+const fileInput   = document.getElementById('fileInput');
+const fileChange  = document.getElementById('fileChange');
+const imgOrig     = document.getElementById('imgOrig');
+const imgResult   = document.getElementById('imgResult');
+const placeholder = document.getElementById('placeholder');
+const loadingBox  = document.getElementById('loadingBox');
+const loadingMsg  = document.getElementById('loadingMsg');
+const loadingSub  = document.getElementById('loadingSub');
+const progBar     = document.getElementById('progBar');
+const dot         = document.getElementById('dot');
+const statusText  = document.getElementById('statusText');
+const btnDownload = document.getElementById('btnDownload');
+const errorBox    = document.getElementById('errorBox');
+
+function loadFile(file) {
+  if (!file || !file.type.startsWith('image/')) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    imgOrig.src = e.target.result;
+    uploadZone.style.display = 'none';
+    workspace.classList.add('on');
+    resetResult();
+    transform(e.target.result);
+  };
+  reader.readAsDataURL(file);
+}
+
+fileInput.addEventListener('change', e => loadFile(e.target.files[0]));
+fileChange.addEventListener('change', e => loadFile(e.target.files[0]));
+uploadZone.addEventListener('dragover', e => e.preventDefault());
+uploadZone.addEventListener('drop', e => { e.preventDefault(); loadFile(e.dataTransfer.files[0]); });
+
+function resetResult() {
+  imgResult.style.display = 'none';
+  imgResult.src = '';
+  placeholder.style.display = 'flex';
+  loadingBox.classList.remove('on');
+  errorBox.classList.remove('on');
+  btnDownload.disabled = true;
+  setStatus('', 'Memulai…');
+  setProgress(0);
+  if (pollTimer) clearInterval(pollTimer);
+}
+
+async function transform(dataUrl) {
+  const base64 = dataUrl.split(',')[1];
+  const mimeType = dataUrl.split(';')[0].split(':')[1];
+
+  setStatus('processing', 'Mengirim ke AI…');
+  placeholder.style.display = 'none';
+  loadingBox.classList.add('on');
+  setProgress(8);
+  setMsg('Menginisialisasi…', 'Mohon tunggu');
+
+  try {
+    const res = await fetch('/api/transform', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'create', imageData: base64, mimeType })
+    });
+
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Gagal membuat prediksi');
+
+    setProgress(20);
+    setMsg('AI sedang memproses…', 'Estimasi 20–50 detik');
+    poll(data.id);
+
+  } catch (err) {
+    showError(err.message);
+  }
+}
+
+function poll(id) {
+  let prog = 20;
+  let attempts = 0;
+
+  pollTimer = setInterval(async () => {
+    attempts++;
+    if (attempts > 150) {
+      clearInterval(pollTimer);
+      showError('Timeout — coba upload lagi');
+      return;
+    }
+
+    try {
+      const res = await fetch('/api/transform', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'check', id })
+      });
+
+      const data = await res.json();
+      if (prog < 88) prog += 1.5;
+      setProgress(Math.min(prog, 88));
+
+      if (data.status === 'starting') setMsg('Model AI starting…', 'Hampir mulai');
+      else if (data.status === 'processing') setMsg(`Mengubah foto jadi GTA V…`, `${attempts} detik berlalu`);
+      else if (data.status === 'succeeded') {
+        clearInterval(pollTimer);
+        setProgress(100);
+        const url = Array.isArray(data.output) ? data.output[0] : data.output;
+        if (!url) { showError('Output kosong dari AI'); return; }
+        loadingBox.classList.remove('on');
+        imgResult.onload = () => {
+          imgResult.style.display = 'block';
+          btnDownload.disabled = false;
+          setStatus('done', 'Selesai! Foto berhasil diubah 🎮');
+          btnDownload.onclick = () => {
+            const a = document.createElement('a');
+            a.href = url; a.download = 'gta-v-style.png'; a.target = '_blank';
+            a.click();
+          };
+        };
+        imgResult.src = url;
+      } else if (data.status === 'failed') {
+        clearInterval(pollTimer);
+        showError(data.error || 'Proses gagal');
+      }
+    } catch (e) { /* keep polling */ }
+  }, 1000);
+}
+
+function showError(msg) {
+  loadingBox.classList.remove('on');
+  placeholder.style.display = 'flex';
+  errorBox.classList.add('on');
+  errorBox.textContent = '⚠ ' + msg;
+  setStatus('error', 'Gagal — coba ganti foto');
+}
+
+function setStatus(type, msg) {
+  dot.className = 'dot' + (type ? ' ' + type : '');
+  statusText.textContent = msg;
+}
+
+function setMsg(main, sub) {
+  loadingMsg.textContent = main;
+  loadingSub.textContent = sub;
+}
+
+function setProgress(pct) {
+  progBar.style.width = pct + '%';
+}
+</script>
+</body>
+</html>
